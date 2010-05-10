@@ -70,5 +70,33 @@ test('#5069 - ui.tabs.add creates two tab panels when using a full URL', functio
 	
 });
 
+test('#5485 - ajax tabs event (tabsshow and tabsload) order and trigger', function() {
+	// http://dev.jqueryui.com/ticket/5485
+	expect(2);
+	var log = function(message) {
+		$("#log").append(message + "-");
+	}	
+	$('<div id="log"></div>').appendTo("body");
+	el = $('#tabs6')
+			.bind("tabsshow", function (event, ui) {
+				log("tabsshow " + ui.index);
+			})
+			.bind("tabsload", function (event, ui) {
+				log("tabsload " + ui.index);
+			})
+			.tabs({
+				load : function (event, ui) {
+					log("load " + ui.index);
+				},
+				show : function (event, ui) {
+					log("show " + ui.index);
+				}
+			});
+	equals($("#log").text(), "tabsload 0-load 0-tabsshow 0-show 0-", 'When tabs is just created, the events order should be load then show');
+	$("#log").html("");
+	el.tabs('select', 1);
+	equals($("#log").text(), "tabsload 1-load 1-tabsshow 1-show 1-", 'When select a tab, the events order should be load then show');
+	$("#log").remove();
+});
 
 })(jQuery);
