@@ -55,6 +55,7 @@ $.widget("ui.tabs", {
 	},
 
 	_tabId: function(a) {
+
 		return a.title && a.title.replace(/\s/g, '_').replace(/[^A-Za-z0-9\-_:\.]/g, '') ||
 			this.options.idPrefix + (++tabId);
 	},
@@ -468,7 +469,8 @@ $.widget("ui.tabs", {
 
 		// try to find an existing element before creating a new one
 		var $panel = $('#' + id);
-		if (!$panel.length) {
+		// create a new one only if it is an in-page tab (remote tab will be created in _tabify) see ticket #5069
+		if (!$panel.length && !url.indexOf('#')) {
 			$panel = $(o.panelTemplate).attr('id', id).data('destroy.tabs', true);
 		}
 		$panel.addClass('ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide');
