@@ -221,10 +221,13 @@ $.widget("ui.accordion", {
 			}).css('overflow', 'auto');
 
 		} else if ( o.autoHeight ) {
-			maxHeight = 0;
-			this.headers.next().each(function() {
-				maxHeight = Math.max(maxHeight, $(this).height());
-			}).height(maxHeight);
+			// maxHeight calculation is 0 if the element is hidden (see Ticket #3905)
+			if ( !this.element.is(":hidden") ) {
+				maxHeight = 0;
+				this.headers.next().each(function() {
+					maxHeight = Math.max(maxHeight, $(this).height());
+				}).height(maxHeight);
+			}
 		}
 
 		return this;
