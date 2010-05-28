@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Accordion Visual Test : Default</title>
+	<link rel="stylesheet" href="../visual.css" type="text/css" />
+	<link rel="stylesheet" href="../../../themes/base/jquery.ui.all.css" type="text/css">
+	<script type="text/javascript" src="../../../jquery-1.4.2.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.effects.core.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.effects.bounce.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.effects.blind.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.panel.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.accordion.js"></script>
+	<script type="text/javascript">
+	$(function() {
+		var accordion = $("#accordion1").accordion({
+			animated: 'slide'
+		});
+		
+		$("#icons").toggle(function() {
+			accordion.accordion("option", "icons", false);
+		}, function() {
+			accordion.accordion("option", "icons", $.ui.accordion.prototype.options.icons);
+		});
+
+		$("#disable").toggle(function() {
+			accordion.accordion("disable");
+		}, function() {
+			accordion.accordion("enable");
+		});
+
+		$("#destroy").toggle(function() {
+			accordion.accordion("destroy");
+		}, function() {
+			accordion.accordion();
+		});
+		$("#slide").click(function() {
+			accordion.accordion("option", "animated", 'slide');
+		}).click();
+		$("#bounceslide").click(function() {
+			accordion.accordion("option", "animated", 'bounceslide');
+		});
+		$("#active0").click(function() {
+			accordion.accordion("option", "active",0);
+		});
+		$("#active1").click(function() {
+			accordion.accordion("option", "active",1);
+		});
+		$("#active2").click(function() {
+			accordion.accordion("option", "active",2);
+		});
+		$("#active3").click(function() {
+			accordion.accordion("option", "active",3);
+		});
+		$("#active4").click(function() {
+			accordion.accordion("option", "active",4);
+		});
+		$("#activefalse").click(function() {
+			accordion.accordion("option", "active",false);
+		});
+		$("#collapsibletrue").click(function() {
+			accordion.accordion("option", "collapsible",true);
+		});
+		$("#collapsiblefalse").click(function() {
+			accordion.accordion("option", "collapsible",false);
+		});
+		$("#tabindex20").click(function() {
+			accordion.attr("tabIndex","20");
+			$("#tabindexaccordion").html("20");
+		}).click();
+		$("#tabindex35").click(function() {
+			accordion.attr("tabIndex","35");
+			$("#tabindexaccordion").html("35");
+		});
+	})
+	</script>
+</head>
+<body>
+tabIndex=30 <input type="text" tabIndex="30" />
+<br/>
+tabIndex=<span id="tabindexaccordion">20</span> <div id="accordion1" tabIndex="20">
+	<h3><a href="#">accordion Header 1</a></h3>
+	<div>
+		accordion Content 1
+	</div>
+	<h3><a href="#">accordion Header 2</a></h3>
+	<div>
+		accordion Content 2
+	</div>
+	<h3><a href="#">accordion Header 3</a></h3>
+	<div>
+		accordion Content 3
+	</div>
+</div>
+tabIndex=10 <input type="text" tabIndex="10" />
+
+<button id="icons" tabIndex="40" >Icons (tabIndex=40)</button>
+<button id="disable">Disable</button>
+<button id="destroy">Destroy</button>
+<br/>
+<input type="radio" name="group1" id="slide"> Slide
+<input type="radio" name="group1" id="bounceslide" checked> bounceslide
+<br/>
+collapsible 
+<input type="radio" name="group2" id="collapsibletrue"> true 
+<input type="radio" name="group2" id="collapsiblefalse" checked="checked"> false
+<br/>
+tabindex accordion 
+<input type="radio" name="group4" id="tabindex20" checked="checked"> 20 
+<input type="radio" name="group4" id="tabindex35"> 35
+<br/>
+active 
+<input type="radio" name="group3" id="active0" checked="checked"> 0
+<input type="radio" name="group3" id="active1"> 1
+<input type="radio" name="group3" id="active2"> 2
+<input type="radio" name="group3" id="active3"> 3
+<input type="radio" name="group3" id="active4"> 4
+<input type="radio" name="group3" id="activefalse"> false
+<div id="log"></div>
+
+</body>
+</html>

@@ -10,13 +10,15 @@
  * Depends:
  *	jquery.ui.core.js
  *	jquery.ui.widget.js
+ *	jquery.ui.panel.js
  */
 (function($) {
+var panel = $.ui.panel;
 
-$.widget("ui.accordion", {
+$.widget( "ui.accordion", panel, {
 	options: {
 		active: 0,
-		animated: 'slide',
+		animated: "slide", 
 		autoHeight: true,
 		clearStyle: false,
 		collapsible: false,
@@ -32,176 +34,75 @@ $.widget("ui.accordion", {
 			return this.href.toLowerCase() == location.href.toLowerCase();
 		}
 	},
+
 	_create: function() {
 
-		var o = this.options, self = this;
-		this.running = 0;
+		var o = this.options, 
+			self = this,
+			active;
 
-		this.element.addClass("ui-accordion ui-widget ui-helper-reset");
+		panel.prototype._create.call( this );
+		this.element.addClass( "ui-accordion" );
 		
 		// in lack of child-selectors in CSS we need to mark top-LIs in a UL-accordion for some IE-fix
-		if (this.element[0].nodeName == "UL") {
-			this.element.children("li").addClass("ui-accordion-li-fix");
+		if ( this.element[0].nodeName == "UL" ) {
+			this.element.children( "li" ).addClass( "ui-accordion-li-fix" );
 		}
 
-		this.headers = this.element.find(o.header).addClass("ui-accordion-header ui-helper-reset ui-state-default ui-corner-all")
-			.bind("mouseenter.accordion", function(){ $(this).addClass('ui-state-hover'); })
-			.bind("mouseleave.accordion", function(){ $(this).removeClass('ui-state-hover'); })
-			.bind("focus.accordion", function(){ $(this).addClass('ui-state-focus'); })
-			.bind("blur.accordion", function(){ $(this).removeClass('ui-state-focus'); });
+		this.headers = this.element.find( o.header ).addClass( "ui-accordion-header" );
 
-		this.headers
-			.next()
-				.addClass("ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom");
+		this.headers.next().addClass( "ui-accordion-content" );
 
 		if ( o.navigation ) {
-			var current = this.element.find("a").filter(o.navigationFilter);
+			var current = this.element.find( "a" ).filter( o.navigationFilter );
 			if ( current.length ) {
-				var header = current.closest(".ui-accordion-header");
+				var header = current.closest( ".ui-accordion-header" );
 				if ( header.length ) {
 					// anchor within header
 					this.active = header;
 				} else {
 					// anchor within content
-					this.active = current.closest(".ui-accordion-content").prev();
+					this.active = current.closest( ".ui-accordion-content" ).prev();
 				}
 			}
 		}
 
-		this.active = this._findActive(this.active || o.active).toggleClass("ui-state-default").toggleClass("ui-state-active").toggleClass("ui-corner-all").toggleClass("ui-corner-top");
-		this.active.next().addClass('ui-accordion-content-active');
-
-		//Append icon elements
-		this._createIcons();
-
 		this.resize();
-
-		//ARIA
-		this.element.attr('role','tablist');
-
-		this.headers
-			.attr('role','tab')
-			.bind('keydown', function(event) { return self._keydown(event); })
-			.next()
-			.attr('role','tabpanel');
-
-		this.headers
-			.not(this.active || "")
-			.attr('aria-expanded','false')
-			.attr("tabIndex", "-1")
-			.next()
-			.hide();
-
-		// make sure at least one header is in the tab order
-		if (!this.active.length) {
-			this.headers.eq(0).attr('tabIndex','0');
-		} else {
-			this.active
-				.attr('aria-expanded','true')
-				.attr('tabIndex', '0');
-		}
-
-		// only need links in taborder for Safari
-		if (!$.browser.safari)
-			this.headers.find('a').attr('tabIndex','-1');
-
-		if (o.event) {
-			this.headers.bind((o.event) + ".accordion", function(event) {
-				self._clickHandler.call(self, event, this);
-				event.preventDefault();
-			});
-		}
+		this.active = this._findActive( this.active || o.active );
+		panel.prototype._clickHandler.call( this,this.active );
 
 	},
 	
-	_createIcons: function() {
-		var o = this.options;
-		if (o.icons) {
-			$("<span/>").addClass("ui-icon " + o.icons.header).prependTo(this.headers);
-			this.active.find(".ui-icon").toggleClass(o.icons.header).toggleClass(o.icons.headerSelected);
-			this.element.addClass("ui-accordion-icons");
-		}
-	},
-	
-	_destroyIcons: function() {
-		this.headers.children(".ui-icon").remove();
-		this.element.removeClass("ui-accordion-icons");
-	},
-
 	destroy: function() {
+	
 		var o = this.options;
 
 		this.element
-			.removeClass("ui-accordion ui-widget ui-helper-reset")
-			.removeAttr("role")
-			.unbind('.accordion')
-			.removeData('accordion');
+			.removeClass( "ui-accordion" );
 
-		this.headers
-			.unbind(".accordion")
-			.removeClass("ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ui-state-active ui-corner-top")
-			.removeAttr("role").removeAttr("aria-expanded").removeAttr("tabIndex");
-
-		this.headers.find("a").removeAttr("tabIndex");
-		this._destroyIcons();
-		var contents = this.headers.next().css("display", "").removeAttr("role").removeClass("ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content ui-accordion-content-active");
+		var contents = this.headers.removeClass( "ui-accordion-header" )
+			.next()
+			.removeClass( "ui-accordion-content ui-accordion-content-active" );
 		if (o.autoHeight || o.fillHeight) {
-			contents.css("height", "");
+			contents.css( "height", "" );
 		}
+
+		panel.prototype.destroy.call( this );
 
 		return this;
 	},
 	
 	_setOption: function(key, value) {
-		$.Widget.prototype._setOption.apply(this, arguments);
+		var o = this.options;
+		panel.prototype._setOption.apply( this, arguments );
 			
 		if (key == "active") {
-			this.activate(value);
+			this.activate( value );
 		}
-		if (key == "icons") {
-			this._destroyIcons();
-			if (value) {
-				this._createIcons();
-			}
+		if ( key == "animated" ) {
+			o.proxied=undefined;
+			o.proxiedDuration=undefined;
 		}
-		
-	},
-
-	_keydown: function(event) {
-
-		var o = this.options, keyCode = $.ui.keyCode;
-
-		if (o.disabled || event.altKey || event.ctrlKey)
-			return;
-
-		var length = this.headers.length;
-		var currentIndex = this.headers.index(event.target);
-		var toFocus = false;
-
-		switch(event.keyCode) {
-			case keyCode.RIGHT:
-			case keyCode.DOWN:
-				toFocus = this.headers[(currentIndex + 1) % length];
-				break;
-			case keyCode.LEFT:
-			case keyCode.UP:
-				toFocus = this.headers[(currentIndex - 1 + length) % length];
-				break;
-			case keyCode.SPACE:
-			case keyCode.ENTER:
-				this._clickHandler({ target: event.target }, event.target);
-				event.preventDefault();
-		}
-
-		if (toFocus) {
-			$(event.target).attr('tabIndex','-1');
-			$(toFocus).attr('tabIndex','0');
-			toFocus.focus();
-			return false;
-		}
-
-		return true;
-
 	},
 
 	resize: function() {
@@ -210,23 +111,31 @@ $.widget("ui.accordion", {
 
 		if (o.fillSpace) {
 			
-			if($.browser.msie) { var defOverflow = this.element.parent().css('overflow'); this.element.parent().css('overflow', 'hidden'); }
+			if ($.browser.msie) { 
+				var defOverflow = this.element.parent().css( "overflow" ); 
+				this.element.parent().css( "overflow", "hidden" ); 
+			}
 			maxHeight = this.element.parent().height();
-			if($.browser.msie) { this.element.parent().css('overflow', defOverflow); }
+			if($.browser.msie) { 
+				this.element.parent().css( "overflow", defOverflow ); 
+			}
 	
 			this.headers.each(function() {
 				maxHeight -= $(this).outerHeight(true);
 			});
 
 			this.headers.next().each(function() {
-    		   $(this).height(Math.max(0, maxHeight - $(this).innerHeight() + $(this).height()));
-			}).css('overflow', 'auto');
+    		   $(this).height( Math.max( 0, maxHeight - $(this).innerHeight() + $(this).height()) );
+			}).css( "overflow", "auto" );
 
 		} else if ( o.autoHeight ) {
-			maxHeight = 0;
-			this.headers.next().each(function() {
-				maxHeight = Math.max(maxHeight, $(this).height());
-			}).height(maxHeight);
+			// maxHeight calculation is 0 if the element is hidden (see Ticket #3905)
+			if ( !this.element.is( ":hidden" ) ) {
+				maxHeight = 0;
+				this.headers.next().each(function() {
+					maxHeight = Math.max( maxHeight, $(this).height() );
+				}).height( maxHeight );
+			}
 		}
 
 		return this;
@@ -235,9 +144,8 @@ $.widget("ui.accordion", {
 	activate: function(index) {
 		// TODO this gets called on init, changing the option without an explicit call for that
 		this.options.active = index;
-		// call clickHandler with custom event
-		var active = this._findActive(index)[0];
-		this._clickHandler({ target: active }, active);
+		var active = this._findActive( index )[0];
+		this._clickHandler.call( this,$(active) );
 
 		return this;
 	},
@@ -245,22 +153,23 @@ $.widget("ui.accordion", {
 	_findActive: function(selector) {
 		return selector
 			? typeof selector == "number"
-				? this.headers.filter(":eq(" + selector + ")")
-				: this.headers.not(this.headers.not(selector))
+				? this.headers.filter( ":eq(" + selector + ")" )
+				: this.headers.not( this.headers.not( selector ) )
 			: selector === false
 				? $([])
-				: this.headers.filter(":eq(0)");
+				: this.headers.filter( ":eq(0)" );
 	},
-
+	
 	// TODO isn't event.target enough? why the seperate target argument?
-	_clickHandler: function(event, target) {
-
+//	_clickHandler: function(event, target) {
+	_clickHandler: function(header) {
+	
 		var o = this.options;
 		if (o.disabled)
 			return;
 
 		// called only when using activate(false) to close all parts programmatically
-		if (!event.target) {
+		if (header.length==0 /*!event.target*/) {
 			if (!o.collapsible)
 				return;
 			this.active.removeClass("ui-state-active ui-corner-top").addClass("ui-state-default ui-corner-all")
@@ -280,7 +189,7 @@ $.widget("ui.accordion", {
 		}
 
 		// get the click target
-		var clicked = $(event.currentTarget || target);
+		var clicked = header /*$(event.currentTarget || target)*/;
 		var clickedIsActive = clicked[0] == this.active[0];
 		
 		// TODO the option is changed, is that correct?
@@ -405,7 +314,7 @@ $.widget("ui.accordion", {
 
 		// TODO assert that the blur and focus triggers are really necessary, remove otherwise
 		toHide.prev().attr('aria-expanded','false').attr("tabIndex", "-1").blur();
-		toShow.prev().attr('aria-expanded','true').attr("tabIndex", "0").focus();
+		toShow.prev().attr('aria-expanded','true').attr("tabIndex", this._tabIndex()).focus();
 
 	},
 
