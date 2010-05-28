@@ -53,13 +53,6 @@ $.widget("ui.panel", {
 			.bind("blur.panel", function() {
 				$(this).removeClass('ui-state-focus');
 			})
-			.bind("click.panel", function(e) {
-				if (self.options.disabled) {
-					return;
-				}
-				self._clickHandler($(this));
-				return false;
-			})
 			.bind( "keydown.panel", function(e) { 
 				return self._keydown( e ); 
 			});
@@ -194,6 +187,9 @@ $.widget("ui.panel", {
 			self=this,
 			o = this.options;
 
+		if (self.options.disabled) {
+			return;
+		}
 		if ( header.hasClass("ui-state-animation-running") ) {
 			return;
 		}		
@@ -216,6 +212,7 @@ $.widget("ui.panel", {
 	},
 	
 	_animationComplete: function( header ) {
+	
 		if ( header.hasClass( "ui-state-active" ) ) {
 			header.attr( "aria-expanded","true" )
 				.attr( "tabIndex", this._tabIndex() );

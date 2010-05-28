@@ -70,9 +70,21 @@ $.widget( "ui.accordion", panel, {
 		this.resize();
 		this.active = this._findActive( this.active || o.active );
 		panel.prototype._clickHandler.call( this,this.active );
-
 	},
 	
+	_createIcons: function() {
+		var o = this.options;
+		panel.prototype._createIcons.call( this );
+		if (o.icons) {
+			this.element.addClass("ui-accordion-icons");
+		}
+	},
+	
+	_destroyIcons: function() {
+		panel.prototype._destroyIcons.call( this );
+		this.element.removeClass("ui-accordion-icons");
+	},
+
 	destroy: function() {
 	
 		var o = this.options;
@@ -158,6 +170,7 @@ $.widget( "ui.accordion", panel, {
 			: selector === false
 				? $([])
 				: this.headers.filter( ":eq(0)" );
+		
 	},
 	
 	// TODO isn't event.target enough? why the seperate target argument?
@@ -165,6 +178,7 @@ $.widget( "ui.accordion", panel, {
 	_clickHandler: function(header) {
 	
 		var o = this.options;
+
 		if (o.disabled)
 			return;
 
